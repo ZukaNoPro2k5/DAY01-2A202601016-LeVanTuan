@@ -70,9 +70,19 @@ def call_openai(
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         # đo thời gian bằng time.time() trước và sau lời gọi API
     """
-    # TODO: import OpenAI, tạo client, gọi chat.completions.create,
-    #       đo start/end time, trả về (response_text, latency)
-    raise NotImplementedError("Implement call_openai")
+    from openai import OpenAI
+
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    start = time.time()
+    response = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=temperature,
+        top_p=top_p,
+        max_tokens=max_tokens,
+    )
+    latency = time.time() - start
+    return response.choices[0].message.content, latency
 
 
 # ---------------------------------------------------------------------------
@@ -93,8 +103,13 @@ def call_openai_mini(
     Gợi ý:
         Tái sử dụng call_openai() với model=OPENAI_MINI_MODEL — 1 dòng code.
     """
-    # TODO: gọi call_openai với model=OPENAI_MINI_MODEL
-    raise NotImplementedError("Implement call_openai_mini")
+    return call_openai(
+        prompt,
+        model=OPENAI_MINI_MODEL,
+        temperature=temperature,
+        top_p=top_p,
+        max_tokens=max_tokens,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -121,8 +136,21 @@ def compare_models(prompt: str) -> dict:
          Dùng .get để lấy đúng giá model đang chạy — gpt-4o, gemini...;
          model không có trong bảng thì lấy giá gpt-4o làm tham chiếu)
     """
-    # TODO: gọi call_openai và call_openai_mini, ghép dict kết quả
-    raise NotImplementedError("Implement compare_models")
+    gpt4o_answer, gpt4o_time = call_openai(prompt)
+    mini_answer, mini_time = call_openai_mini(prompt)
+    pricing = PRICING_PER_1K_TOKENS.get(
+        OPENAI_MODEL, PRICING_PER_1K_TOKENS["gpt-4o"]
+    )
+    gpt4o_cost = (
+        (len(gpt4o_answer.split()) / 0.75) / 1000 * pricing["output"]
+    )
+    return {
+        "gpt4o_answer": gpt4o_answer,
+        "mini_answer": mini_answer,
+        "gpt4o_time": gpt4o_time,
+        "mini_time": mini_time,
+        "gpt4o_cost": gpt4o_cost,
+    }
 
 
 # ===========================================================================
