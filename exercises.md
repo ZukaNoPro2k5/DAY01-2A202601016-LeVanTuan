@@ -16,12 +16,12 @@ Gọi `call_openai` với temperature 0.0, 0.7, 1.2 và 1.8 dùng prompt
 
 **Bạn nhận thấy quy luật gì qua bốn phản hồi? Ở mức nào phản hồi bắt đầu
 kém mạch lạc?** (2–3 câu)
-> *Câu trả lời của bạn*
+> Ở temperature 0.0, model trả lời trực tiếp về 36 phố phường, còn các mức 0.7, 1.2 và 1.8 lần lượt chọn những thông tin đa dạng hơn về đường tàu, cầu Long Biên và con đường gốm sứ. Cả bốn phản hồi đều có cấu trúc hợp lý; ngay cả mức 1.8 vẫn chưa biểu hiện kém mạch lạc rõ ràng, mặc dù nội dung thay đổi và có tính ngẫu nhiên cao hơn. Các câu bị dừng giữa chừng là do giới hạn `max_tokens=120`, không phải do temperature.
 
 ### Câu 1.2 — Chọn temperature cho sản phẩm
 **Bạn sẽ đặt temperature bao nhiêu cho trợ lý soạn thảo hợp đồng pháp lý,
 và bao nhiêu cho trợ lý viết slogan quảng cáo? Giải thích khác biệt.**
-> *Câu trả lời của bạn*
+> Tôi sẽ đặt temperature khoảng 0.2 cho trợ lý soạn thảo hợp đồng pháp lý vì tác vụ này cần câu chữ ổn định, chính xác và hạn chế nội dung sáng tạo ngoài yêu cầu. Với trợ lý viết slogan quảng cáo, tôi sẽ chọn temperature khoảng 1.2 để tạo ra nhiều cách diễn đạt mới lạ và đa dạng hơn. Hợp đồng ưu tiên tính nhất quán và độ tin cậy, trong khi slogan ưu tiên khả năng sáng tạo.
 
 ### Câu 1.3 — Đánh đổi chi phí
 Kịch bản: 20.000 người dùng hoạt động mỗi ngày, mỗi người gọi API 2 lần,
@@ -30,7 +30,7 @@ mỗi lần trung bình ~500 token đầu ra.
 **Ước tính chi phí mỗi ngày của model lớn so với model nhỏ cho workload này
 (dựa trên bảng giá trong template). Nêu một trường hợp model lớn xứng đáng
 với chi phí và một trường hợp model nhỏ là lựa chọn đúng:**
-> *Câu trả lời của bạn*
+> Workload này tạo ra 20.000 × 2 = 40.000 lượt gọi, tương đương 40.000 × 500 = 20 triệu output token mỗi ngày. Theo bảng giá trong `template.py`, GPT-4o tốn khoảng 20.000 × 0,010 = 200 USD/ngày, còn GPT-4o-mini tốn khoảng 20.000 × 0,0006 = 12 USD/ngày; phép tính này chưa bao gồm input token. Model lớn xứng đáng với chi phí cho tác vụ quan trọng như phân tích hoặc rà soát hợp đồng phức tạp, còn model nhỏ phù hợp với chatbot FAQ hoặc yêu cầu đơn giản có lưu lượng lớn.
 
 ---
 
@@ -46,7 +46,7 @@ khác nhau:
 **Hai phản hồi khác nhau như thế nào (giọng văn, độ dài, mức kỹ thuật)?
 Từ đó rút ra system prompt điều khiển được những khía cạnh nào của phản hồi?**
 (3–4 câu)
-> *Câu trả lời của bạn*
+> Với persona nhà thơ, phản hồi sử dụng các hình ảnh ví von như hạt giống, khu vườn tri thức và ánh mặt trời nên có giọng văn giàu hình ảnh, dễ tiếp cận và gần như không dùng thuật ngữ kỹ thuật. Với persona kỹ sư phần mềm, phản hồi dài và có cấu trúc rõ ràng hơn, đưa ra định nghĩa chính xác, phân loại các phương pháp học máy và bắt đầu minh họa bằng code Python. Hai phản hồi trả lời cùng một câu hỏi nhưng khác rõ rệt về giọng văn, độ dài và mức độ kỹ thuật. Qua đó, system prompt có thể điều khiển persona, cách dùng từ, mức chi tiết, cấu trúc trình bày và loại ví dụ trong phản hồi.
 
 ### Câu 2.2 — tiktoken vs đếm từ
 Chọn một đoạn văn tiếng Việt ~150 từ. So sánh số token theo `count_tokens`
@@ -55,7 +55,7 @@ Chọn một đoạn văn tiếng Việt ~150 từ. So sánh số token theo `co
 **Hai con số chênh nhau bao nhiêu phần trăm? Nếu dùng ước lượng thô để dự
 toán ngân sách API cho ứng dụng tiếng Việt, bạn sẽ dự toán thiếu hay thừa —
 và vì sao?**
-> *Câu trả lời của bạn*
+> Đoạn văn được chọn có 166 từ; `count_tokens` đếm được 188 token, trong khi công thức số từ chia cho 0,75 ước lượng 221,33 token. Hai kết quả chênh lệch khoảng 15,06%, trong đó phương pháp ước lượng thô cao hơn thực tế khoảng 33,33 token nên sẽ làm dự toán ngân sách bị thừa đối với đoạn văn này. Nguyên nhân là tokenizer chia văn bản thành các token hoặc subword phụ thuộc vào nội dung, dấu câu, ký tự tiếng Việt và bộ mã hóa của model, nên không tồn tại một tỷ lệ cố định giữa số từ và số token.
 
 ---
 
